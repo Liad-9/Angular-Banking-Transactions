@@ -1,0 +1,128 @@
+<div>
+  <header>
+    <h3 class="presenterDetails">{{ presenterName }} </h3>
+  </header>
+</div>
+<br>
+<br>
+<h1>Welcome to {{accountDetails.bankName}} </h1>
+<hr>
+<div *ngIf="currentDiv == 1">
+  <h1>user: {{accountDetails.toString()}} </h1>
+  <h3><button (click)="logOff()">התנתק</button>
+    <button (click)="cngPwd()">החלפת סיסמא</button>
+  </h3>
+  <h2 style="text-align: center;">מסך הזנת תנועות</h2>
+  <p dir="rtl">
+    <label for="amount">סכום:</label>
+    <input id="amount" type="number" [(ngModel)]="currentAmount" min="0" required />
+    <br />
+    <label for="asmachta">אסמכתא:</label>
+    <textarea id="asmachta" [(ngModel)]="currentTransactionAsmachta"></textarea>
+    <br />
+    <br />
+    <label for="taarich">תאריך:</label>
+    <input type=date id="taarich" [(ngModel)]="currentTransactionDateS" required />
+    <br />
+    <br />
+    <label for="sugpeula">פעולה מבוקשת:</label>
+    <select id="sugpeula" [(ngModel)]="currentTransactionType">
+      <option value="-1">נא לבחור</option>
+      <option *ngFor="let typename of transactionTypeNames; let i=index;" value="{{i}}">{{typename}}</option>
+    </select>
+    <br />
+    <br />
+    <button (click)="doTransaction()">בצע פעולה</button>
+    <br />
+    <br />
+  </p>
+  <p *ngIf="!lastActionFail">
+    {{transaction}}
+  </p>
+  <p *ngIf="!lastActionFail" [class.minus]="currentBalance < 0">
+    your current balance is: {{currentBalance|currency:'ILS'}}
+  </p>
+  <p dir="rtl" *ngIf="lastActionFail">
+    פעולתך נדחתה עקב חריגה מתקרת אשראי של <bdo dir="ltr">{{accountDetails.limit|currency:'ILS'}}</bdo>
+  </p>
+  <br>
+  <p dir="rtl">
+    <label for="showAllTransactions"> האם להציג את רשימת כול הטרנזקציות עד כה?</label>
+    <input type="checkbox" id="showAllTransactions" [(ngModel)]="showAllTransactions" />
+  </p>
+  <br>
+  <div *ngIf="showAllTransactions">
+    <table dir="rtl" *ngIf="transactions.length > 0">
+      <h2>טבלת פעולות</h2>
+      <tr>
+        <th>מספר סידורי</th>
+        <th>תאריך פעולה</th>
+        <th>סכום</th>
+        <th>סוג פעולה</th>
+        <th>יתרה בחשבון</th>
+        <th>מחיקת פעולה</th>
+      </tr>
+      <tr *ngFor="let transaction of transactions; let i = index"
+        [ngClass]="{'negative-balance': transaction.balance < 0}">
+        <td>{{ i + 1 }}</td>
+        <td>{{ transaction.trnDate | date:'dd/MM/yyyy' }}</td>
+        <td [style.color]="transaction.amount < 0 ? 'red' : 'black'">{{ transaction.amount | currency:'ILS' }}</td>
+        <td>{{ transactionTypeNames[transaction.trnType] }}</td>
+        <td [style.background-color]="transaction.balance < 0 ? 'red' : 'transparent'">{{ transaction.balance|
+          currency:'ILS' }}</td>
+        <td><button (click)="deleteTransaction(i)">מחק</button></td>
+      </tr>
+    </table>
+    <p *ngIf="transactions.length == 0" class="no-transaction">
+      לא נמצאו פעולות לחשבון
+    </p>
+  </div>
+</div>
+<div *ngIf="currentDiv==0" dir="rtl"> 
+  <br />
+  <br />
+  <fieldset style="width:300px;margin:auto;">
+    <legend style="background-color: gray;">מסך זיהוי משתמש</legend>
+    <br />
+    <br />
+    <label for="doel">מייל/ מזהה משתמש</label>
+    <input required type="email" id="doel" [(ngModel)]="typedUserCredentils.eml">
+    <br />
+    <br />
+    <label for="pwd">סיסמת משתמש</label>
+    <input required type="password" id="sisma" [(ngModel)]="typedUserCredentils.pwd">
+    <br />
+    <br />
+    <button (click)="logIn()">כנס</button>
+    <br />
+    <br />
+    <button (click)="clrUsrLoginFlds()">ניקוי שדות </button>
+    <br>
+    <br>
+    <button (click)="saveAsUser()">שמור פרטי משתמש</button>
+  </fieldset>
+</div>
+<div dir="rtl" *ngIf="currentDiv==2"> 
+  <fieldset style="width: 50%;margin: auto;">
+    <legend>מסך החלפת סיסמא</legend>
+    <br>
+    <br>
+    <label for="crntPwd">סיסמא נוכחית</label>
+    <input type="password" id="crntPwd" [(ngModel)]="crntPwd">
+    <br>
+    <br>
+    <br>
+    <label for="nwPwd">סיסמא מבוקשת</label>
+    <input type="password" id="nwPwd" [(ngModel)]="nwPwd">
+    <br>
+    <br>
+    <br>
+    <label for="renwPwd">מבוקשת שוב</label>
+    <input type="password" id="renwPwd" [(ngModel)]="renwPwd">
+    <br>
+    <br>
+    <button (click)="changePwd()">שמור סיסמא</button>
+    <br>
+    <br>
+  </fieldset>
+</div>
